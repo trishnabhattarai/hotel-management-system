@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include <conio.h>
+// #include <conio.h> // Removed for Linux compatibility
 #include <stdlib.h>
-#include <windows.h>
+// #include <windows.h> // Removed for Linux compatibility
 #include <time.h>
 
 struct customers{
@@ -25,41 +25,51 @@ void displayss();
 
 void stafflogin();
 void addcustomer();
-COORD coord = {0, 0};
-
-void gotoxy(int x, int y) {
-	coord.X = x;
-	coord.Y = y;
-	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleCursorPosition(output, coord);
-}
+// COORD coord = {0, 0}; // Removed for Linux compatibility
+// void gotoxy(int x, int y) { // Removed for Linux compatibility
+// 	coord.X = x;
+// 	coord.Y = y;
+// 	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+// 	SetConsoleCursorPosition(output, coord);
+// }
 
 FILE *fp, *fr;
+
+void displayWelcomeScreen() {
+    system("clear"); // Clear the console for Linux
+    /* gotoxy removed for Linux compatibility */
+    printf("Welcome to the Hotel Management System\n"); // Added newline
+    /* gotoxy removed for Linux compatibility */
+    printf("Press any key to continue...\n"); // Added newline
+    getchar(); // Wait for a key press (consumes the key). scanf %d in main will skip the newline.
+}
 
 int main()
 {
 	int n, opt;
 	char continu = 'y';
 
+	displayWelcomeScreen(); // Call the welcome screen function
+
 	while (continu == 'y') {
-		system("cls");
+		system("clear"); // Changed for Linux
 	    head();
-		gotoxy(50,10);
+		/* gotoxy removed for Linux compatibility */
 		printf("\n 1. Admin");
-		gotoxy(50,12);
+		/* gotoxy removed for Linux compatibility */
 		printf("\n 2. User");
-		gotoxy(50,14);
+		/* gotoxy removed for Linux compatibility */
 		printf("\n Your choice : ");
-		gotoxy(18,15);
+		/* gotoxy removed for Linux compatibility */
 		scanf("%d", &opt);
 		switch(opt){
 			case 1:
-				system("cls");
+				system("clear"); // Changed for Linux
 				adminlogin();
 				break;
 				
 			case 2:
-				system("cls");
+				system("clear"); // Changed for Linux
 				stafflogin();
 				break;
 			
@@ -70,8 +80,9 @@ int main()
 
 		
 		printf("\n Do you want to go to the first page? (y/n)   ");
-		fflush(stdin);
-		scanf("%c", &continu);
+		// int ch_consume_main; while ((ch_consume_main = getchar()) != '\n' && ch_consume_main != EOF && ch_consume_main != ' '); // Clear buffer before reading char
+		// Removed: scanf(" %c", ...) handles leading whitespace. The loop might consume the input itself.
+		scanf(" %c", &continu); // Added space to skip leading whitespace
 	}
 
 	return 0;
@@ -79,16 +90,16 @@ int main()
 
 void head()
 {
-	system("cls");
-	gotoxy(60, 4);
-	printf("Hotel Management System");
+	system("clear"); // Changed for Linux
+	/* gotoxy removed for Linux compatibility */
+	printf("Hotel Management System\n"); // Added newline
 	time_t currentTime;
     struct tm *localTime;
     time(&currentTime);
     localTime = localtime(&currentTime);
-    gotoxy(0, 0);
+    /* gotoxy removed for Linux compatibility */
     printf("Current date: %s", asctime(localTime));
-    gotoxy(0,8);
+    /* gotoxy removed for Linux compatibility */
 }
  void adminlogin()
  {
@@ -96,33 +107,19 @@ void head()
 	char curUsername[30], curUserPassword[30];
 	int num;
 	 head();
-	gotoxy(50,12);
+	/* gotoxy removed for Linux compatibility */
 	printf("\n Enter your username :\t ");
-	fflush(stdin);
-	gets(curUsername);
-	gotoxy(50,14);
+	int ch_consume_admin_user; while ((ch_consume_admin_user = getchar()) != '\n' && ch_consume_admin_user != EOF); // Clear buffer after previous scanf %d
+	scanf("%29s", curUsername); // Changed gets to scanf for safety
+	/* gotoxy removed for Linux compatibility */
 	printf("\n Enter your Password :\t ");
-	char ch;
-	int i = 0;
-	while (1) {
-		ch = getch();
-		if (ch == '\r') {  
-			curUserPassword[i] = '\0';
-			break;
-		} else if (ch == '\b' && i > 0) { 
-			i--;
-			printf("\b \b"); 
-		} else {
-			curUserPassword[i] = ch;
-			i++;
-			printf("*"); // Print a '' for each character to the screen
-		}
-	}
+	// Password input will be visible. getch() is not available on Linux.
+	scanf("%29s", curUserPassword); // Changed for Linux compatibility
 
 	if (!strcmp(curUsername,username) && !strcmp(curUserPassword, pass)) {
-		system("cls");
+		system("clear"); // Changed for Linux
 		head();
-		gotoxy(0,8);
+		/* gotoxy removed for Linux compatibility */
 		printf("\n1. See  all record");
 		printf("\n2. Search");
 		printf("\n3. Edit information");
@@ -161,33 +158,19 @@ void stafflogin()
 	char curUsername[30], curUserPassword[30];
 	int num;
 	 head();
-	gotoxy(50,12);
+	/* gotoxy removed for Linux compatibility */
 	printf("\n Enter your username :\t ");
-	fflush(stdin);
-	gets(curUsername);
-	gotoxy(50,14);
+	int ch_consume_staff_user; while ((ch_consume_staff_user = getchar()) != '\n' && ch_consume_staff_user != EOF); // Clear buffer after previous scanf %d
+	scanf("%29s", curUsername); // Changed gets to scanf for safety
+	/* gotoxy removed for Linux compatibility */
 	printf("\n Enter your Password :\t ");
-	char ch;
-	int i = 0;
-	while (1) {
-		ch = getch();
-		if (ch == '\r') {  
-			curUserPassword[i] = '\0';
-			break;
-		} else if (ch == '\b' && i > 0) { 
-			i--;
-			printf("\b \b"); 
-		} else {
-			curUserPassword[i] = ch;
-			i++;
-			printf("*"); // Print a '' for each character to the screen
-		}
-	}
+	// Password input will be visible. getch() is not available on Linux.
+	scanf("%29s", curUserPassword); // Changed for Linux compatibility
 	if (!strcmp(curUsername,username2) && !strcmp(curUserPassword, pass2))
 	{
-		system("cls");
+		system("clear"); // Changed for Linux
 		head();
-		gotoxy(0,8);
+		/* gotoxy removed for Linux compatibility */
 		printf("1. Add Customer.\n");
 		printf("2. View Record.\n");
 		printf("3. Search.\n");
@@ -230,20 +213,20 @@ void addcustomer(){
 	}
 		head();
 		
-		gotoxy(0,8);
+		/* gotoxy removed for Linux compatibility */
 		printf("\nEnter Customer Name :\t ");
-		fflush(stdin);
-		gets(c.name);
+		int ch_consume_cust_name; while ((ch_consume_cust_name = getchar()) != '\n' && ch_consume_cust_name != EOF); // Clear buffer
+		scanf("%29s", c.name); // Replaced gets with scanf for safety and compatibility
 		printf("\nEnter Phone no      :\t ");
 		scanf("%d", &c.phone);
 		printf("\nEnter Email         :\t");
-		fflush(stdin);
-		gets(c.email);
+		int ch_consume_cust_email; while ((ch_consume_cust_email = getchar()) != '\n' && ch_consume_cust_email != EOF); // Clear buffer
+		scanf("%29s", c.email); // Replaced gets with scanf for safety and compatibility
 		printf("\nEnter Room no       :\t ");
 		scanf("%d", &c.roomno);
 		fwrite(&c, sizeof(struct customers), 1, fr);
 		printf("\nData inserted successfully.\n\n");
-		getch();
+		getchar(); // Consumes the newline from previous scanf. For an actual pause, another getchar() would be needed.
 	fclose(fr);
 }
 
@@ -321,7 +304,7 @@ void edit() {
 	FILE *fr;
 
 	while (cont == 'y') {
-		system("cls");
+		system("clear"); // Changed for Linux
 		head();
 
 		printf("\nEnter Customer Name: ");
@@ -370,7 +353,7 @@ void edit() {
 		}
 
 		printf("\nDo you want to continue? (y/n): ");
-		fflush(stdin);
+		// fflush(stdin); // Removed, space in " %c" handles leading whitespace
 		scanf(" %c", &cont);  // space before %c to ignore newline
 		
 	}
@@ -384,7 +367,7 @@ void del() {
 	
 
 	while (cont == 'y') {
-		system("cls");
+		system("clear"); // Changed for Linux
 
 		printf("\nEnter customer phone number to delete: ");
 		scanf("%d", &phonenumber);
@@ -429,7 +412,7 @@ void del() {
 		}
 
 		printf("\nDo you want to continue? (y/n): ");
-		fflush(stdin);
+		// fflush(stdin); // Removed, space in " %c" handles leading whitespace
 		scanf(" %c", &cont);  // note the space before %c to catch newline
 	}
 }
