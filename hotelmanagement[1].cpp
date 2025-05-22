@@ -43,7 +43,7 @@ void addcustomer();
 FILE *fp, *fr;
 
 void displayWelcomeScreen() {
-    system("clear"); // Clear the console for Linux
+    system("cls"); // Clear the console for Linux
     /* gotoxy removed for Linux compatibility */
     printf("Welcome to the Hotel Management System\n"); // Added newline
     /* gotoxy removed for Linux compatibility */
@@ -59,7 +59,7 @@ int main()
 	displayWelcomeScreen(); // Call the welcome screen function
 
 	while (continu == 'y') {
-		system("clear"); // Changed for Linux
+		system("cls"); // Changed for Linux
 	    head();
 		/* gotoxy removed for Linux compatibility */
 		printf("\n 1. Admin");
@@ -71,12 +71,12 @@ int main()
 		scanf("%d", &opt);
 		switch(opt){
 			case 1:
-				system("clear"); // Changed for Linux
+				system("cls"); // Changed for Linux
 				adminlogin();
 				break;
 				
 			case 2:
-				system("clear"); // Changed for Linux
+				system("cls"); // Changed for Linux
 				stafflogin();
 				break;
 			
@@ -97,7 +97,7 @@ int main()
 
 void head()
 {
-	system("clear"); // Changed for Linux
+	system("cls"); // Changed for Linux
 	/* gotoxy removed for Linux compatibility */
 	printf("Hotel Management System\n"); // Added newline
 	time_t currentTime;
@@ -124,7 +124,7 @@ void head()
 	scanf("%29s", curUserPassword); // Changed for Linux compatibility
 
 	if (!strcmp(curUsername,username) && !strcmp(curUserPassword, pass)) {
-		system("clear"); // Changed for Linux
+		system("cls"); // Changed for Linux
 		head();
 		/* gotoxy removed for Linux compatibility */
 		printf("\n1. See  all record");
@@ -175,7 +175,7 @@ void stafflogin()
 	scanf("%29s", curUserPassword); // Changed for Linux compatibility
 	if (!strcmp(curUsername,username2) && !strcmp(curUserPassword, pass2))
 	{
-		system("clear"); // Changed for Linux
+		system("cls"); // Changed for Linux
 		head();
 		/* gotoxy removed for Linux compatibility */
 		printf("1. Add Customer.\n");
@@ -333,7 +333,7 @@ void edit() {
 	FILE *fr;
 
 	while (cont == 'y') {
-		system("clear"); // Changed for Linux
+		system("cls"); // Changed for Linux
 		head();
 
 		printf("\nEnter Customer Name: ");
@@ -486,7 +486,7 @@ void del() {
 	
 
 	while (cont == 'y') {
-		system("clear"); // Changed for Linux
+		system("cls"); // Changed for Linux
 
 		printf("\nEnter customer phone number to delete: ");
 		scanf("%d", &phonenumber);
@@ -535,4 +535,3 @@ void del() {
 		scanf(" %c", &cont);  // note the space before %c to catch newline
 	}
 }
-
