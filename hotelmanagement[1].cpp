@@ -32,6 +32,7 @@ void displayss();
 
 void stafflogin();
 void addcustomer();
+void calculateAndSetTotalBill(struct customers* cust); // Prototype
 // COORD coord = {0, 0}; // Removed for Linux compatibility
 // void gotoxy(int x, int y) { // Removed for Linux compatibility
 // 	coord.X = x;
@@ -180,9 +181,10 @@ void stafflogin()
 		/* gotoxy removed for Linux compatibility */
 		printf("1. Add Customer.\n");
 		printf("2. View Record.\n");
-		printf("3. Search.\n");
-		printf("4. Back.\n");
-		printf("5. Exit.\n");
+		printf("3. Edit Information.\n"); // New option
+		printf("4. Search.\n");         // Renumbered
+		printf("5. Back.\n");           // Renumbered
+		printf("6. Exit.\n");           // Renumbered
 		printf("=");
 		scanf("%d", &num); 
 		switch(num)
@@ -193,18 +195,23 @@ void stafflogin()
 			case 2:
 				displayss();
 				break;
-				
-			case 3:
+			case 3: // New case
+				edit();
+				break;
+			case 4: // Renumbered from 3
 				searchcustomer_by_number();
 				break;
-			
-			case 4:
+			case 5: // Renumbered from 4
 				main();
 				break;
-				
-			case 5:
+			case 6: // Renumbered from 5
 				exit(0);
-				
+				break;
+			default:
+			    printf("Invalid choice. Please try again.\n"); // Optional: more informative default
+			    // getchar(); // Pause if needed
+			    // int ch_consume_invalid; while ((ch_consume_invalid = getchar()) != '\n' && ch_consume_invalid != EOF);
+
 		}
 	}
 }
@@ -246,10 +253,53 @@ void addcustomer(){
 		c.totalBill = 0.0f;
 		c.stayDuration = 0;
 
+		// Check for existing customer by phone to update visitCount
+		FILE* fr_check;
+		struct customers temp_cust;
+		fr_check = fopen("hoteldetail.txt", "rb");
+		if (fr_check != NULL) {
+			// Iterate from the end of the file to find the latest record for the phone number
+			// This requires a bit more complex logic than simple sequential read if we want the *absolute latest*
+			// For simplicity as per instruction (break on first find), this will find the *oldest* record's visitCount.
+			// To get the *latest* visitCount for a specific phone number, one would typically read all records for that phone number
+			// and pick the one with the highest visitCount or latest check-in, or sort records by an ID/timestamp.
+			// Given the current structure and instruction, we find the first encountered.
+			// A better approach might be to read all, find max visitCount for phone, then increment.
+			// However, sticking to "break on first find" for now.
+			long current_pos;
+			int found_match = 0; // Flag to ensure we only use the last found match if reading backwards
+			
+			// Read records from beginning to end to find the latest visitCount for that phone
+			int latest_visit_count_for_phone = 0;
+			while(fread(&temp_cust, sizeof(struct customers), 1, fr_check) == 1) {
+				if (temp_cust.phone == c.phone) {
+					if (temp_cust.visitCount > latest_visit_count_for_phone) { // Keep track of the highest visit count
+                        latest_visit_count_for_phone = temp_cust.visitCount;
+                    }
+				}
+			}
+			if (latest_visit_count_for_phone > 0) {
+                 c.visitCount = latest_visit_count_for_phone + 1;
+            }
+            // If no match, c.visitCount remains 1 (as initialized)
+
+			fclose(fr_check);
+		}
+		// If fr_check is NULL, it might be the first run, so c.visitCount remains 1.
+
 		fwrite(&c, sizeof(struct customers), 1, fr);
 		printf("\nData inserted successfully.\n\n");
 		getchar(); // Consumes the newline from previous scanf. For an actual pause, another getchar() would be needed.
 	fclose(fr);
+}
+
+// Definition of calculateAndSetTotalBill
+void calculateAndSetTotalBill(struct customers* cust) {
+    float bill = (float)cust->stayDuration * cust->roomRate;
+    if (cust->stayDuration > 5) {
+        bill = bill * 0.85f; // Apply 15% discount
+    }
+    cust->totalBill = bill;
 }
 
 void searchcustomer_by_number() {
@@ -356,6 +406,12 @@ void edit() {
 					printf("\nCurrent Check-In Time: %s", c.checkInTime);
 					printf("\nCurrent Check-Out Time: %s", c.checkOutTime);
 					printf("\nCurrent Room Rate: %.2f", c.roomRate);
+					printf("\nStay Duration: %d days", c.stayDuration);
+					printf("\nTotal Bill: %.2f", c.totalBill); // Will show current value, calculation is next step
+					printf("\nVisit Count: %d", c.visitCount);
+					if (c.visitCount >= 2) {
+						printf("\nSPECIAL OFFER: Eligible for free breakfast!");
+					}
 
 					// Clear buffer from previous scanf("%s", name)
 					int ch_consume_edit_start; while((ch_consume_edit_start = getchar()) != '\n' && ch_consume_edit_start != EOF);
@@ -418,6 +474,8 @@ void edit() {
 						if (time_in_secs == -1 || time_out_secs == -1) {
 							c.stayDuration = 0;
 							printf("\nError: Invalid check-in or check-out date format. Stay duration not calculated.\n");
+							calculateAndSetTotalBill(&c);
+							printf("\nTotal bill updated: %.2f\n", c.totalBill);
 						} else {
 							double difference_seconds = difftime(time_out_secs, time_in_secs);
 							c.stayDuration = (int)(difference_seconds / (60 * 60 * 24));
@@ -425,13 +483,19 @@ void edit() {
 								c.stayDuration = 0;
 							}
 							printf("\nStay duration calculated: %d days.\n", c.stayDuration);
+							calculateAndSetTotalBill(&c);
+							printf("\nTotal bill updated: %.2f\n", c.totalBill);
 						}
 					} else if (temp_checkOutTime[0] != '\0' && strcmp(c.checkOutTime, "N/A") == 0) {
                         // If user explicitly set checkout time to N/A (or it was already N/A and they provided blank input for temp_checkOutTime)
                         c.stayDuration = 0;
-                         printf("\nCheck-out time is N/A. Stay duration set to 0.\n");
+                        printf("\nCheck-out time is N/A. Stay duration set to 0.\n");
+                        calculateAndSetTotalBill(&c);
+                        printf("\nTotal bill updated: %.2f\n", c.totalBill);
+                    } else if (temp_checkOutTime[0] == '\0') { // User skipped updating checkout time, recalculate bill based on potentially new roomRate
+                        calculateAndSetTotalBill(&c);
+                        printf("\nTotal bill (recalculated with potentially new room rate): %.2f\n", c.totalBill);
                     }
-
 
 					printf("\n\nEnter New Phone Number (Press Enter to keep %d): ", c.phone);
 					// Logic to conditionally read phone: read as string, if not empty, convert and update.
